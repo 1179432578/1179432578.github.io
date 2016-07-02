@@ -1,5 +1,5 @@
 ---
-title: Test
+title: new index
 ---
 
 ### Lewis's blog
