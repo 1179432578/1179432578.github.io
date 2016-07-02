@@ -14,28 +14,28 @@ url: "http://yourdomain.com" # the base hostname & protocol for your site
 github_username:  1179432578
 
 # Build settings
-markdown: kramdown
-highlighter: rouge
+# highlighter: pygments
+# markdown: kramdown  # [ maruku | rdiscount | kramdown | redcarpet ]
+# kramdown:
+#   # input:         GFM
+#   auto_ids:      true
+#   auto_id_prefix: 'id-'
+#   # footnote_nr:   1
+#   # entity_output: as_char
+#   # toc_levels:    1..6
+#   smart_quotes:  lsquo,rsquo,ldquo,rdquo
+  # use_coderay:   true
 
-# Markdown Processors
-rdiscount:
-  extensions: []
+  # coderay:
+  #   coderay_wrap:              div
+  #   coderay_line_numbers:      inline
+  #   coderay_line_number_start: 1
+  #   coderay_tab_width:         2
+  #   coderay_bold_every:        10
+  #   coderay_css:               style
 
+# highlighter: Pygments
+# pygment:  false
+markdown: redcarpet
 redcarpet:
-  extensions: []
-
-kramdown:
-  auto_ids:       true
-  footnote_nr:    1
-  entity_output:  as_char
-  toc_levels:     1..6
-  smart_quotes:   lsquo,rsquo,ldquo,rdquo
-  enable_coderay: false
-
-  coderay:
-    coderay_wrap:              div
-    coderay_line_numbers:      inline
-    coderay_line_number_start: 1
-    coderay_tab_width:         4
-    coderay_bold_every:        10
-    coderay_css:               style
+  extensions: ["no_intra_emphasis", "fenced_code_blocks"]
