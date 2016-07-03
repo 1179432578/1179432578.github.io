@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>C++STL详解-STL组件分析</title>
+  <meta name="description" content="STL简介STL是一套用c++泛型技术实现的模板库。源码已经公开，这是SGI的版本源码下载地址：SGI STL 如果在自己的编译器上查看不了，可以下载下来查看，不同公司或组织的实现不太一样的。下面的分析使用的是苹果公司xcode自带的STL源码。STL由几大组件构成，分别是容器、迭代器、分配器、算法、函数对象。下...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/bcyy/cplusplus/stl/2016/07/03/C++STL%E8%AF%A6%E8%A7%A3(%E4%B8%80).html">
+  <link rel="alternate" type="application/rss+xml" title="Lewis-游亦有道" href="http://yourdomain.com/feed.xml">
+  <!-- <link rel="stylesheet" href="/stylesheets/pygments.css"> -->
+  <link rel="stylesheet" href="/highlight/styles/github-gist.css">
+  <link rel="stylesheet" href="/css/lewis.css">
+  <script src="/highlight/highlight.pack.js"></script>
+  <script>
+
+  //  window.onload = function(){
+  //    var codeTags = document.getElementsByTagName("code");
+  //    for (var i = 0; i < codeTags.length; i++) {
+  //      codeTags[i].innerHTML = "<pre>" + codeTags[i].innerHTML + "</pre>";
+  //    }
+  // };
+  hljs.initHighlightingOnLoad();
+  </script>
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Lewis-游亦有道</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        <!-- 
+          
+          <a class="page-link" href="/about/">关于</a>
+          
+        
+          
+          <a class="page-link" href="/game/">游戏</a>
+          
+        
+          
+        
+          
+        
+          
+         -->
+        <a class="page-link" href="/index.html">主页</a>
+        <a class="page-link" href="/programming/index.html">编程语言</a>
+        <a class="page-link" href="/gamedevelop/index.html">游戏开发</a>
+        <a class="page-link" href="/game/index.html">游戏</a>
+        <a class="page-link" href="/about/index.html">关于</a>
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">C++STL详解-STL组件分析</h1>
+    <p class="post-meta"><time datetime="2016-07-03T10:42:28+08:00" itemprop="datePublished">Jul 3, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="stl">STL简介</h3>
+
+<p>STL是一套用c++泛型技术实现的模板库。源码已经公开，这是SGI的版本源码下载地址：<a href="https://www.sgi.com/tech/stl/download.html">SGI STL</a> 如果在自己的编译器上查看不了，可以下载下来查看，不同公司或组织的实现不太一样的。下面的分析使用的是苹果公司xcode自带的STL源码。
+STL由几大组件构成，分别是容器、迭代器、分配器、算法、函数对象。下面将对每个组件进行分析。</p>
+
+<h3 id="stl">STL组件简介</h3>
+
+<h1 id="container">container</h1>
+
+<p>容器是元素的集合，大多数容器可以有重复元素，map不允许有一样的元素。有些容器是用其它容器包装形成的，使用了适配器模式。同时每个容器内部都有一个内部类(不一定在内部定义，有的实现在外部定义成结构，如SGI)，这个内部类是一个迭代器，用来遍历容器的，用户可以通过迭代器访问容器，同时STL的泛型算法也是根据迭代器进行元素访问的。
+容器如下：</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">容器</th>
+<th style="text-align: center">数据结构</th>
+<th style="text-align: center">迭代器类型</th>
+<th style="text-align: center">适配模板(底层容器)</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">vector</td>
+<td style="text-align: center">数组</td>
+<td style="text-align: center">随机访问</td>
+<td style="text-align: center">-</td>
+</tr>
+<tr>
+<td style="text-align: center">deque</td>
+<td style="text-align: center">多个数组</td>
+<td style="text-align: center">随机访问</td>
+<td style="text-align: center">-</td>
+</tr>
+<tr>
+<td style="text-align: center">list</td>
+<td style="text-align: center">双向循环链表</td>
+<td style="text-align: center">双向</td>
+<td style="text-align: center">-</td>
+</tr>
+<tr>
+<td style="text-align: center">set</td>
+<td style="text-align: center">红黑树</td>
+<td style="text-align: center">双向</td>
+<td style="text-align: center">-</td>
+</tr>
+<tr>
+<td style="text-align: center">map</td>
+<td style="text-align: center">红黑树</td>
+<td style="text-align: center">双向</td>
+<td style="text-align: center">-</td>
+</tr>
+<tr>
+<td style="text-align: center">multimap</td>
+<td style="text-align: center">红黑树</td>
+<td style="text-align: center">双向</td>
+<td style="text-align: center">-</td>
+</tr>
+<tr>
+<td style="text-align: center">stack</td>
+<td style="text-align: center">栈</td>
+<td style="text-align: center">-</td>
+<td style="text-align: center">deque</td>
+</tr>
+<tr>
+<td style="text-align: center">queue</td>
+<td style="text-align: center">队列</td>
+<td style="text-align: center">-</td>
+<td style="text-align: center">deque</td>
+</tr>
+<tr>
+<td style="text-align: center">priority_queue</td>
+<td style="text-align: center">最大堆</td>
+<td style="text-align: center">-</td>
+<td style="text-align: center">vector</td>
+</tr>
+</tbody></table>
+
+<p>每个容器都是对一种数据结构与操作的封装，可以方便客户直接使用，而不需要再去实现这些，STL对小程序或者要求不高的程序完全是可以接受的，如果对STL的性能不满意，内存分配想自己实现，完全可以参考STL定制一套专用的模板库。再次之前，你必须证明STL的不足，不然自己设计了一套东西，拿出来一比，性能并没提升，那么就不妙了。参考STL的代码，写一个自己用的模板库也是可以的，可以当学习用，也可以写写小项目，但是给别人用或者看，我觉得就不太好了，尤其接口改动比较大的，别人对STL代码的理解能力肯定比阅读你的模板库的能力高。
+容器提供了许多常规操作，有插入、删除、查找、修改元素以及清除整个容器。不同容器对元素的这些操作时间复杂度是不一样的，这些操作的耗时主要由它们的数据结构决定。每个容器中的元素都是用户提供的元素的副本，这些元素必须具有拷贝、复制自己的能力。对于基本类型内存复制这块消耗的时间少点，对于类类型，如果数据有点多，建议使用这些元素的指针作为副本传给容器。少量数据的类可以直接使用自身作为副本，不必向系统通过new请求内存分配，而直接在栈中分配内存。这里new的效率可能比栈中分配内存然后把自身副本传递给容器低，new调用的operator new操作已经被STL改写，可能STL管理的空间足够，不需要向系统申请内存，直接在管理的内存池中拿出一块内存，这个操作也耗时间的，如果内存池满了，那么会向系统申请内存，系统这个时候会进行上下文切换，进入内核态，进行系统调用，这个也耗时间的。不过传指针给容器，通常都不会有问题。</p>
+
+<p>vector由一个数组构成，可以进行随机的访问容器中元素。它可以自动进行增长，可能一开始容量为1，后面容量不够时，分配一块原容量2倍的内存替换现在的内存。</p>
+
+<p>deque是一个双端队列，有一个总的数组，每个元素是一个槽，指向一个数组，这些数组盛放容器元素，而总数组记录了槽的大小，开始时队列的开始于结束指针在总数组的中间，所以可以在队列的前面插入元素。当deque容量不够时，它并不需要把以前的内存释放掉，只需要把总数组变大，然后再加个装元素的数组插在槽上就行了。</p>
+
+<p>list是一个双向循环链表，插入、删除O(1)完成，但是查找就比较慢了。</p>
+
+<p>set是一个平衡二叉树，可以向它插入或者删除元素，但是不能修改元素，修改元素就相当于删除然后插入。STL并未set提供修改元素功能，完全自己可以加个接口，调用删除然后插入。<a href="http://stackoverflow.com/questions/908949/what-happens-when-you-modify-an-element-of-an-stdset">=&gt;why cannot modify an element of an std::set</a> 仔细分析下，set的删除是惰性删除，就是做个删除标记。为了红黑树的删除与插入后仍旧保持平衡，代价是比较昂贵的，所以删除就不真删除。改变一个元素的值操作也比较昂贵，STL也就不提供了。</p>
+
+<p>map是一个平衡二叉树，元素是一个(key, value)对，类似一个字典，通过把一些kv对插入，然后通过关键字查询这个字典中存储的值。它的删除也应该是惰性删除。插入、删除的速度还可以，主要作用就是查询，查询用平衡二叉树来做，时间复杂度是O(lgN)比vector、list等的线性时间快多了。</p>
+
+<p>multimap比map多了一个功能，就是可以放相同的元素在容器中。</p>
+
+<p>stack是一个先进后出的栈数据结构，默认对deque进行了包装适配</p>
+
+<p>queue是一个先进先出的队列数据结构，默认对deque进行了包装适配</p>
+
+<p>priority_queue是一个优先队列，使用最大堆实现，默认对vector进行了包装适配，第一个元素是最大的</p>
+
+<h1 id="iterator">iterator</h1>
+
+<p>迭代器用来访问容器元素的，所有的非适配容器都提供了迭代器，不同容器的迭代器类型不仅不一样，而且有些容器迭代器没有提供比较运算符，下面是几个容器的迭代器的区别：</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">容器</th>
+<th style="text-align: center">数据结构</th>
+<th style="text-align: center">迭代器类型</th>
+<th style="text-align: center">适配模板(底层容器)</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">vector</td>
+<td style="text-align: center">数组</td>
+<td style="text-align: center">随机访问</td>
+<td style="text-align: center">-</td>
+</tr>
+<tr>
+<td style="text-align: center">deque</td>
+<td style="text-align: center">多个数组</td>
+<td style="text-align: center">随机访问</td>
+<td style="text-align: center">-</td>
+</tr>
+<tr>
+<td style="text-align: center">list</td>
+<td style="text-align: center">双向循环链表</td>
+<td style="text-align: center">双向</td>
+<td style="text-align: center">-</td>
+</tr>
+<tr>
+<td style="text-align: center">set</td>
+<td style="text-align: center">红黑树</td>
+<td style="text-align: center">双向</td>
+<td style="text-align: center">-</td>
+</tr>
+<tr>
+<td style="text-align: center">map</td>
+<td style="text-align: center">红黑树</td>
+<td style="text-align: center">双向</td>
+<td style="text-align: center">-</td>
+</tr>
+<tr>
+<td style="text-align: center">multimap</td>
+<td style="text-align: center">红黑树</td>
+<td style="text-align: center">双向</td>
+<td style="text-align: center">-</td>
+</tr>
+<tr>
+<td style="text-align: center">stack</td>
+<td style="text-align: center">栈</td>
+<td style="text-align: center">-</td>
+<td style="text-align: center">deque</td>
+</tr>
+<tr>
+<td style="text-align: center">queue</td>
+<td style="text-align: center">队列</td>
+<td style="text-align: center">-</td>
+<td style="text-align: center">deque</td>
+</tr>
+<tr>
+<td style="text-align: center">priority_queue</td>
+<td style="text-align: center">最大堆</td>
+<td style="text-align: center">-</td>
+<td style="text-align: center">vector</td>
+</tr>
+</tbody></table>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Lewis-游亦有道</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Lewis-游亦有道</li>
+          <li><a href="mailto:lewis.lufei@gmail.com">lewis.lufei@gmail.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/1179432578"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">1179432578</span></a>
+
+          </li>
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

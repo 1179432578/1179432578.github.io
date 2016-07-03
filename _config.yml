@@ -38,4 +38,4 @@ github_username:  1179432578
 # pygment:  false
 markdown: redcarpet
 redcarpet:
-  extensions: ["no_intra_emphasis", "fenced_code_blocks"]
+  extensions: ["no_intra_emphasis", "fenced_code_blocks","autolink", "tables", "with_toc_data"]

@@ -1,0 +1,14 @@
+table{
+table-layout:fixed;
+empty-cells:show;
+border-collapse: collapse;
+margin:0 auto;
+}
+table{
+border:1px solid #cad9ea;
+color:#666;
+}
+table td,table th{
+border:1px solid #cad9ea;
+padding:0 1em 0;
+}
